@@ -67,9 +67,16 @@ def _build_chat_history(data: ChatMessage) -> list[dict]:
     messages = []
     history = ChatHistoryHelper(data.chat_history)
     for msg in history.get_last_n_messages(20):
-        role = "user" if msg.role == "user" else "assistant"
-        if msg.content:
-            messages.append({"role": role, "content": msg.content})
+        # Handle both dict and object access patterns
+        if isinstance(msg, dict):
+            msg_role = msg.get("role", "")
+            msg_content = msg.get("content", "")
+        else:
+            msg_role = msg.role
+            msg_content = msg.content
+        role = "user" if msg_role == "user" else "assistant"
+        if msg_content:
+            messages.append({"role": role, "content": msg_content})
     return messages
 
 
