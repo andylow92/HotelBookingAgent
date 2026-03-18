@@ -39,7 +39,6 @@ SAMPLE_OWM_RESPONSE = {
 }
 
 
-@pytest.mark.asyncio
 async def test_fetch_weather_parses_response():
     with respx.mock:
         respx.get("https://api.openweathermap.org/data/2.5/forecast").mock(
@@ -60,7 +59,6 @@ async def test_fetch_weather_parses_response():
     assert day2.temp == pytest.approx(14.8, abs=0.1)
 
 
-@pytest.mark.asyncio
 async def test_fetch_weather_summary_contains_days():
     with respx.mock:
         respx.get("https://api.openweathermap.org/data/2.5/forecast").mock(
@@ -72,14 +70,12 @@ async def test_fetch_weather_summary_contains_days():
     assert "Friday" in result.summary    # 2026-03-20 is Friday
 
 
-@pytest.mark.asyncio
 async def test_fetch_weather_raises_on_missing_key(monkeypatch):
     monkeypatch.delenv("WEATHER_API_KEY", raising=False)
     with pytest.raises(RuntimeError, match="WEATHER_API_KEY"):
         await fetch_weather("Berlin")
 
 
-@pytest.mark.asyncio
 async def test_fetch_weather_raises_on_http_error():
     with respx.mock:
         respx.get("https://api.openweathermap.org/data/2.5/forecast").mock(

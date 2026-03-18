@@ -36,7 +36,6 @@ def test_haversine_long_distance():
     assert 1800 < dist < 1950
 
 
-@pytest.mark.asyncio
 async def test_geocode_returns_coords():
     mock_response = [{"lat": "52.5219184", "lon": "13.4132147"}]
     with respx.mock:
@@ -50,7 +49,6 @@ async def test_geocode_returns_coords():
     assert result.lon == pytest.approx(13.41, abs=0.01)
 
 
-@pytest.mark.asyncio
 async def test_geocode_returns_none_for_unknown():
     with respx.mock:
         respx.get("https://nominatim.openstreetmap.org/search").mock(
@@ -61,7 +59,6 @@ async def test_geocode_returns_none_for_unknown():
     assert result is None
 
 
-@pytest.mark.asyncio
 async def test_geocode_caches_results():
     mock_response = [{"lat": "52.5219184", "lon": "13.4132147"}]
     call_count = 0
