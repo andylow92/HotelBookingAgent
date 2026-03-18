@@ -300,17 +300,23 @@ def generate_negotiation_note(
         price_diff = best.price_per_night - cheapest.price_per_night
         if abs(price_diff) < 1:
             parts.append("similarly priced")
-        else:
+        elif price_diff > 0:
             parts.append(f"€{price_diff:.0f}/night cheaper")
+        else:
+            parts.append(f"€{abs(price_diff):.0f}/night more")
 
         # Tradeoffs
         tradeoffs: list[str] = []
         rating_drop = best.rating - cheapest.rating
-        if abs(rating_drop) >= 0.2:
+        if rating_drop >= 0.2:
             tradeoffs.append(f"drops to {cheapest.rating:.1f} stars")
+        elif rating_drop <= -0.2:
+            tradeoffs.append(f"rated higher at {cheapest.rating:.1f} stars")
         dist_diff = cheapest.distance_km - best.distance_km
-        if abs(dist_diff) >= 0.2 and not (cheapest.distance_km == 0.0 and best.distance_km == 0.0):
-            tradeoffs.append(f"sits {abs(dist_diff):.1f}km further")
+        if dist_diff >= 0.2 and not (cheapest.distance_km == 0.0 and best.distance_km == 0.0):
+            tradeoffs.append(f"sits {dist_diff:.1f}km further")
+        elif dist_diff <= -0.2 and not (cheapest.distance_km == 0.0 and best.distance_km == 0.0):
+            tradeoffs.append(f"closer at {cheapest.distance_km:.1f}km")
         if best.free_cancellation and not cheapest.free_cancellation:
             tradeoffs.append("lacks free cancellation")
 

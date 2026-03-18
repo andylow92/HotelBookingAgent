@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from shared.models import SearchRequest, SearchResponse, Weights
 from provider_agent.api_client import search_hotels
-from provider_agent.scorer import score_and_rank
+from provider_agent.scorer import score_and_rank, generate_negotiation_note
 
 
 def search(request: SearchRequest) -> tuple[SearchResponse, list[dict]]:
@@ -49,7 +49,8 @@ def search(request: SearchRequest) -> tuple[SearchResponse, list[dict]]:
     )
 
     # 4. Build response
-    response = SearchResponse(action="search_results", options=ranked_options)
+    note = generate_negotiation_note(ranked_options, request.weights)
+    response = SearchResponse(action="search_results", options=ranked_options, negotiation_note=note)
 
     return response, raw_hotels
 
@@ -72,4 +73,5 @@ def rescore(
         SearchResponse with freshly scored, ranked, and tagged top 3 options.
     """
     ranked_options = score_and_rank(raw_hotels, weights, max_budget, desired_amenities)
-    return SearchResponse(action="search_results", options=ranked_options)
+    note = generate_negotiation_note(ranked_options, weights)
+    return SearchResponse(action="search_results", options=ranked_options, negotiation_note=note)
