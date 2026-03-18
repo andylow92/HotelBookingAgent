@@ -18,7 +18,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Negotiation
 
-- [ ] **NEGO-01**: Negotiation note generator explains tradeoffs between top 3 options (price vs location vs rating)
+- [x] **NEGO-01**: Negotiation note generator explains tradeoffs between top 3 options (price vs location vs rating)
 
 ### CRUD
 
@@ -88,7 +88,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRCH-04 | Phase 3 | Complete |
 | SRCH-05 | Phase 3 | Complete |
 | SRCH-06 | Phase 3 | Complete |
-| NEGO-01 | Phase 5 | Pending |
+| NEGO-01 | Phase 5 | Complete |
 | CRUD-01 | Phase 4 | Complete |
 | CRUD-02 | Phase 4 | Complete |
 | CRUD-03 | Phase 4 | Complete |
