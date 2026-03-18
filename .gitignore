@@ -1,10 +1,32 @@
-__pycache__/
-*.py[cod]
-*.egg-info/
-dist/
-build/
-.env
+# Virtual environment
 .venv/
 venv/
-.pytest_cache/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# IDE files
+.vscode/
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
 .DS_Store
+Thumbs.db
