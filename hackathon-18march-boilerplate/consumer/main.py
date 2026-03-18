@@ -463,17 +463,20 @@ async def process_message(data: ChatMessage):
 
     try:
         variables = Variables(data.variables)
-        openai_key = variables.get("OPENAI_API_KEY")
+
+        # Try Orca variables first, then fall back to environment variable
+        openai_key = variables.get("OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
 
         if not openai_key:
             session.stream(
                 "OpenAI API key is not configured. "
-                "Please set the OPENAI_API_KEY variable in Orca."
+                "Set it as an Orca variable or as the OPENAI_API_KEY environment variable.\n"
+                "Example: export OPENAI_API_KEY=sk-..."
             )
             session.close()
             return
 
-        domain = variables.get("DOMAIN") or "hotels"
+        domain = variables.get("DOMAIN") or os.environ.get("DOMAIN") or "hotels"
 
         agent = ConsumerAgent(openai_api_key=openai_key, domain=domain)
         await agent.handle_message(session, data)
