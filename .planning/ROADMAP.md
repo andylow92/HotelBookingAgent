@@ -69,10 +69,10 @@ Plans:
   2. Book operation accepts hotel selection and returns confirmation ID
   3. Read operation fetches booking details by ID
   4. Cancel operation cancels booking and returns refund status
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md — Action router + CRUD handlers (search/book/read/cancel)
 
 ### Phase 5: Negotiation Notes
 **Goal**: Tradeoff explanations that make the demo compelling
