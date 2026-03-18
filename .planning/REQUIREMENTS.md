@@ -12,9 +12,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **SRCH-01**: Provider Agent calls Amadeus API with destination, dates, guests, and max price constraints
 - [x] **SRCH-02**: API response is normalized to 0–1 scores across 5 dimensions (price, location, rating, cancellation, amenities)
 - [x] **SRCH-03**: Scoring engine applies weighted formula — all weights sum to 1.0, produces total score 0–1
-- [ ] **SRCH-04**: Results ranked by total score, top 3 returned with score breakdowns
-- [ ] **SRCH-05**: Top results tagged: BEST_BALANCE, CHEAPEST, HIGHEST_RATED
-- [ ] **SRCH-06**: Re-scoring with changed weights produces new rankings without re-fetching from API
+- [x] **SRCH-04**: Results ranked by total score, top 3 returned with score breakdowns
+- [x] **SRCH-05**: Top results tagged: BEST_BALANCE, CHEAPEST, HIGHEST_RATED
+- [x] **SRCH-06**: Re-scoring with changed weights produces new rankings without re-fetching from API
 
 ### Negotiation
 
@@ -85,9 +85,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRCH-01 | Phase 2 | Complete |
 | SRCH-02 | Phase 1 | Complete |
 | SRCH-03 | Phase 1 | Complete |
-| SRCH-04 | Phase 3 | Pending |
-| SRCH-05 | Phase 3 | Pending |
-| SRCH-06 | Phase 3 | Pending |
+| SRCH-04 | Phase 3 | Complete |
+| SRCH-05 | Phase 3 | Complete |
+| SRCH-06 | Phase 3 | Complete |
 | NEGO-01 | Phase 5 | Pending |
 | CRUD-01 | Phase 4 | Pending |
 | CRUD-02 | Phase 4 | Pending |
