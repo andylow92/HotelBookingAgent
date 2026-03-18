@@ -143,11 +143,11 @@ async def process_message(data: ChatMessage):
 
     try:
         variables = Variables(data.variables)
-        anthropic_key = variables.get("ANTHROPIC_API_KEY")
+        anthropic_key = variables.get("MADHACK-ANTHROPIC-KEY")
         weather_key = variables.get("WEATHER_API_KEY")
 
         if not anthropic_key:
-            session.stream("Missing ANTHROPIC_API_KEY. Please configure it in Orca variables.")
+            session.stream("Missing MADHACK-ANTHROPIC-KEY. Please configure it in Orca variables.")
             session.close()
             return
 
