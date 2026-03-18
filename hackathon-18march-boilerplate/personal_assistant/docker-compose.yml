@@ -1,0 +1,5 @@
+services:
+  personal-assistant:
+    build: .
+    ports:
+      - "8002:8002"
