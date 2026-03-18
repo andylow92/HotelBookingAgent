@@ -42,10 +42,10 @@ Plans:
   1. api_client.py calls Amadeus API with destination, dates, guests, and max price
   2. mock_data.py returns realistic Berlin hotel results matching Amadeus response structure
   3. API failures (429, timeout, errors) automatically fall back to mock data without crashing
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Amadeus API client + mock data fallback
 
 ### Phase 3: Search & Ranking
 **Goal**: Complete search returns top 3 scored, tagged results with re-score capability
