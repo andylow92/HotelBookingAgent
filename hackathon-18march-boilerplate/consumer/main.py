@@ -152,6 +152,7 @@ Today's date: {date.today().isoformat()}
 6. Confirm — share the reservation ID and a brief summary. Offer to help with anything else.
 
 ## Rules
+- NEVER invent or guess weather data, temperatures, or climate information. Only share weather details you received from the get_weather tool. If the tool fails or is unavailable, simply say weather info is unavailable and move on — do NOT fill in with your own knowledge of typical weather.
 - Never invent availability or prices. Always ask the hotel agent.
 - When querying for availability, send the dates and guest count in the message to the hotel agent.
 - If a hotel agent is unreachable, inform the user and continue with the remaining ones.
@@ -192,13 +193,13 @@ Today's date: {date.today().isoformat()}
                         elif block.name == "get_weather":
                             city = block.input.get("city", "")
                             if not weather_api_key:
-                                result = "Weather API key is not configured. Skip weather info."
+                                result = "Weather data is unavailable (API key not configured). Do NOT guess or invent weather information."
                             else:
                                 try:
                                     result = await fetch_weather(city, weather_api_key)
                                 except Exception as e:
                                     logger.warning("Weather fetch failed for %s: %s", city, e)
-                                    result = f"Could not fetch weather for {city}: {e}"
+                                    result = f"Weather data is unavailable for {city} (fetch failed). Do NOT guess or invent weather information."
                             tool_results.append({
                                 "type": "tool_result",
                                 "tool_use_id": block.id,
