@@ -66,6 +66,9 @@ async def process_message(data: ChatMessage):
             session.error("ANTHROPIC_API_KEY is not configured.")
             return
 
+        if not weather_api_key:
+            logger.warning("WEATHER_API_KEY is not set — weather tool will be disabled.")
+
         client = anthropic.Anthropic(api_key=anthropic_key)
 
         # Discover connected hotel agents at runtime
@@ -112,29 +115,38 @@ async def process_message(data: ChatMessage):
                 },
             })
 
-        tools.append({
-            "name": "get_weather",
-            "description": (
-                "Get the 5-day weather forecast for a city. Use this when the user "
-                "mentions a destination so you can include weather context in your "
-                "recommendations (e.g. packing tips, outdoor activity advice)."
-            ),
-            "input_schema": {
-                "type": "object",
-                "properties": {
-                    "city": {
-                        "type": "string",
-                        "description": "City name, e.g. 'Berlin' or 'Paris'.",
+        if weather_api_key:
+            tools.append({
+                "name": "get_weather",
+                "description": (
+                    "Get the 5-day weather forecast for a city. Use this when the user "
+                    "mentions a destination so you can include weather context in your "
+                    "recommendations (e.g. packing tips, outdoor activity advice)."
+                ),
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "city": {
+                            "type": "string",
+                            "description": "City name, e.g. 'Berlin' or 'Paris'.",
+                        },
                     },
+                    "required": ["city"],
                 },
-                "required": ["city"],
-            },
-        })
+            })
 
         # Include recent conversation history for context
         history = ChatHistoryHelper(data.chat_history)
         recent_messages = history.get_last_n_messages(10)
         messages = recent_messages + [{"role": "user", "content": data.message}]
+
+        # Build weather instructions conditionally
+        if weather_api_key:
+            weather_step = "2. Check the weather — when the user mentions a destination, use get_weather to fetch the forecast. Include relevant weather context in your recommendations (packing tips, activity suggestions, or warnings about bad weather).\n"
+            weather_rule = "- NEVER invent or guess weather data, temperatures, or climate information. Only share weather details you received from the get_weather tool. If the tool fails, do NOT mention weather at all — just silently skip it and focus on the hotel results.\n- When presenting weather, be concise: mention the key conditions and temperatures, don't list every single day unless asked."
+        else:
+            weather_step = ""
+            weather_rule = "- You do NOT have access to weather data. NEVER mention weather, temperatures, climate, or forecasts in any way. Do not suggest the user check a forecast. Just focus on hotels."
 
         system_prompt = f"""You are Alex, a personal travel assistant. Your job is to help users find and book the best hotel for their trip by consulting connected hotel agents, comparing their options, and completing bookings on the user's behalf.
 
@@ -145,19 +157,17 @@ Today's date: {date.today().isoformat()}
 
 ## How to work
 1. Gather requirements — if the user hasn't provided travel dates, number of guests, or any preferences, ask before querying hotels. You need at minimum: check-in date, check-out date, and number of guests.
-2. Check the weather — when the user mentions a destination, use get_weather to fetch the forecast. Include relevant weather context in your recommendations (packing tips, activity suggestions, or warnings about bad weather).
-3. Query hotels — use ask_hotel_agent to search availability. For open-ended requests ("find me a hotel"), check all available agents. For a specific hotel, query only that one.
-4. Compare and present — summarize the options side by side: hotel name, available room types, price per night, total cost, and notable perks. Include weather-appropriate tips (e.g. "the pool will be great given the sunny forecast" or "consider a hotel with indoor amenities given the rain expected").
+{weather_step}3. Query hotels — use ask_hotel_agent to search availability. For open-ended requests ("find me a hotel"), check all available agents. For a specific hotel, query only that one.
+4. Compare and present — summarize the options side by side: hotel name, available room types, price per night, total cost, and notable perks.
 5. Complete the booking — once the user chooses a room, ask for their name and email if not already provided, then call the hotel agent with a reservation request. Pass all required details: room ID, check-in, check-out, guests, name, and email.
 6. Confirm — share the reservation ID and a brief summary. Offer to help with anything else.
 
 ## Rules
-- NEVER invent or guess weather data, temperatures, or climate information. Only share weather details you received from the get_weather tool. If the tool fails or is unavailable, do NOT mention weather at all — just silently skip it and focus on the hotel results. Do not say "check a forecast" or give any weather-related advice without real data.
+{weather_rule}
 - Never invent availability or prices. Always ask the hotel agent.
 - When querying for availability, send the dates and guest count in the message to the hotel agent.
 - If a hotel agent is unreachable, inform the user and continue with the remaining ones.
-- Keep responses friendly and concise. You are the user's advocate.
-- When presenting weather, be concise: mention the key conditions and temperatures, don't list every single day unless asked."""
+- Keep responses friendly and concise. You are the user's advocate."""
 
         # Agentic loop
         while True:
@@ -192,14 +202,11 @@ Today's date: {date.today().isoformat()}
 
                         elif block.name == "get_weather":
                             city = block.input.get("city", "")
-                            if not weather_api_key:
-                                result = "Weather data is unavailable. Do NOT mention weather at all in your response — skip it entirely."
-                            else:
-                                try:
-                                    result = await fetch_weather(city, weather_api_key)
-                                except Exception as e:
-                                    logger.warning("Weather fetch failed for %s: %s", city, e)
-                                    result = f"Weather data is unavailable for {city}. Do NOT mention weather at all in your response — skip it entirely."
+                            try:
+                                result = await fetch_weather(city, weather_api_key)
+                            except Exception as e:
+                                logger.warning("Weather fetch failed for %s: %s", city, e)
+                                result = f"Weather data is unavailable for {city}. Do NOT mention weather at all in your response — skip it entirely."
                             tool_results.append({
                                 "type": "tool_result",
                                 "tool_use_id": block.id,
