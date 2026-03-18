@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: Not started
-status: completed
-last_updated: "2026-03-18T13:29:57.025Z"
+current_plan: "04-01"
+status: in_progress
+last_updated: "2026-03-18T13:55:25Z"
 last_activity: 2026-03-18
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
+  total_phases: 5
+  completed_phases: 4
+  total_plans: 4
+  completed_plans: 4
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** Given weighted preferences, score hotel results accurately and return ranked options with clear tradeoff explanations
-**Current focus:** Phase 3 - Search & Ranking
+**Current focus:** Phase 4 - CRUD Action Routing
 
 ## Current Position
 
-**Phase:** 3 of 5 (Search & Ranking)
-**Current Plan:** Not started
+**Phase:** 4 of 5 (CRUD Action Routing)
+**Current Plan:** Completed 04-01
 **Total Plans in Phase:** 1
-**Status:** Milestone complete
+**Status:** Phase complete
 **Last Activity:** 2026-03-18
 
 ## Performance Metrics
@@ -51,6 +51,7 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 | Phase 01 P01 | 3min | 2 tasks | 4 files |
 | Phase 02 P01 | 2min | 2 tasks | 2 files |
 | Phase 03 P01 | 1min | 1 tasks | 1 files |
+| Phase 04 P01 | 1min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,10 @@ Recent decisions affecting current work:
 - [Phase 03]: search() returns (SearchResponse, raw_hotels) tuple — caller caches raw data for rescore
 - [Phase 03]: rescore() is separate function, not mode flag — per locked CONTEXT.md decision
 - [Phase 03]: No module-level state — raw_hotels passed explicitly to rescore()
+- [Phase 04]: Dispatch dict pattern for action routing — cleaner than if/elif chain
+- [Phase 04]: Module-level _bookings dict and _last_search_options cache — resets on restart, demo-appropriate
+- [Phase 04]: Refund derived from free_cancellation at cancel time — locked CONTEXT.md decision
+- [Phase 04]: Read response wraps booking in 'booking' key to avoid status field collision
 
 ### Pending Todos
 
@@ -83,5 +88,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 03-01-PLAN.md
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None

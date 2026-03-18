@@ -22,10 +22,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### CRUD
 
-- [ ] **CRUD-01**: JSON action router dispatches search/book/read/cancel to correct handler
-- [ ] **CRUD-02**: Book operation sends booking request and returns confirmation ID
-- [ ] **CRUD-03**: Read operation fetches booking details by booking ID
-- [ ] **CRUD-04**: Cancel operation cancels booking and returns refund status
+- [x] **CRUD-01**: JSON action router dispatches search/book/read/cancel to correct handler
+- [x] **CRUD-02**: Book operation sends booking request and returns confirmation ID
+- [x] **CRUD-03**: Read operation fetches booking details by booking ID
+- [x] **CRUD-04**: Cancel operation cancels booking and returns refund status
 
 ### Reliability
 
@@ -89,10 +89,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRCH-05 | Phase 3 | Complete |
 | SRCH-06 | Phase 3 | Complete |
 | NEGO-01 | Phase 5 | Pending |
-| CRUD-01 | Phase 4 | Pending |
-| CRUD-02 | Phase 4 | Pending |
-| CRUD-03 | Phase 4 | Pending |
-| CRUD-04 | Phase 4 | Pending |
+| CRUD-01 | Phase 4 | Complete |
+| CRUD-02 | Phase 4 | Complete |
+| CRUD-03 | Phase 4 | Complete |
+| CRUD-04 | Phase 4 | Complete |
 | RLBL-01 | Phase 2 | Complete |
 | RLBL-02 | Phase 2 | Complete |
 
