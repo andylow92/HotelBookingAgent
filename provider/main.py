@@ -301,39 +301,79 @@ async def process_message(data: ChatMessage):
     session = handler.begin(data)
 
     try:
+        import json
         variables = Variables(data.variables)
-        # API keys are provided as Orca variables — retrieve them like this:
         #api_key = variables.get("API_KEY", "")
         #api_base_url = variables.get("API_BASE_URL", "http://localhost:8080")
         anthropic_key = variables.get("MADHACK-ANTHROPIC-KEY")
 
-        # --- Your provider agent logic goes here ---
-        
-        # Connect with Hotel API wrapper
-        #hotel_api = HotelAPI(api_key=api_key, base_url=api_base_url)
+        SYSTEM_PROMPT = """You are a travel-related API Provider Agent. Another agent will ask you for travel data.
+You must respond with ONLY a raw JSON object (without markdown formatting, no ```json) representing the API call to make.
+The JSON format must be exactly:
+{"class": "ClassName", "action": "method_name", "params": {"param1": "value1", ...}}
 
-        # 2. Use any LLM (OpenAI, Anthropic, etc.) to understand incoming requests
+Available classes and actions:
+1. HotelAPI: get_rooms(), get_available_rooms(check_in, check_out, guests), get_pricing(room_id, check_in, check_out), create_reservation(room_id, guest_name, guest_email, check_in, check_out, num_guests), get_reservations(status), get_reservation(reservation_id), cancel_reservation(reservation_id)
+2. CarRentalAPI: get_categories(), get_vehicles(category, seats), get_available_vehicles(pickup_date, return_date, category, seats), get_vehicle(vehicle_id), get_pricing(vehicle_id, pickup_date, return_date), create_rental(vehicle_id, customer_name, customer_email, pickup_date, return_date), get_rentals(status), get_rental(rental_id), cancel_rental(rental_id)
+3. FlightAPI: get_destinations(), get_flights(origin, destination, date), search_flights(origin, destination, date, passengers), get_flight(flight_id), get_pricing(flight_id, seat_class, passengers), create_booking(flight_id, passenger_name, passenger_email, num_passengers, seat_class), get_bookings(status), get_booking(booking_id), cancel_booking(booking_id)
+4. MuseumAPI: get_time_slots(), get_ticket_types(), get_availability(date, time_slot_id, visitors), get_pricing(ticket_type, visitors), create_ticket(time_slot_id, visit_date, visitor_name, visitor_email, num_visitors, ticket_type), get_tickets(date, status), get_ticket(ticket_id), cancel_ticket(ticket_id)
+5. RestaurantAPI: get_time_slots(), get_tables(), get_available_tables(date, time_slot, party_size), create_reservation(table_id, guest_name, guest_email, date, time_slot, party_size, special_requests), get_reservations(date, status), get_reservation(reservation_id), cancel_reservation(reservation_id)
+6. TourGuideAPI: get_categories(), get_tours(category, difficulty, max_price, location), get_tour(tour_id), get_available_tours(tour_id, date, guests), get_pricing(tour_id, guests), create_booking(tour_id, tour_date, guest_name, guest_email, num_guests), get_bookings(status, date), get_booking(booking_id), cancel_booking(booking_id)
+
+Output ONLY valid JSON."""
+
         client = anthropic.Anthropic(api_key=anthropic_key)
         print("anthropic_key", anthropic_key)
         response = client.messages.create(
-            model="claude-haiku-4-5",  # The current latest Haiku model
+            model="claude-3-5-haiku-20241022",
             max_tokens=1000,
-            temperature=0.7,
+            temperature=0.0,
+            system=SYSTEM_PROMPT,
             messages=[
                 {
                     "role": "user", 
-                    "content": "Write a haiku about artificial intelligence."
+                    "content": data.message
                 }
             ]
         )
-        # 3. Print the response
-        print(response.content[0].text)
-        session.stream(response.content[0].text)
-
-        # 3. Map user intent to API actions (search, book, cancel, list, etc.)
-        # 4. Return concise, structured results
         
-        #session.stream("Provider agent is not implemented yet, but the HotelAPI wrapper class is ready.")
+        response_text = response.content[0].text.strip()
+        print("Claude response:", response_text)
+        
+        try:
+            action_json = json.loads(response_text)
+            class_name = action_json.get("class")
+            action_name = action_json.get("action")
+            params = action_json.get("params", {})
+            
+            api_classes = {
+                "HotelAPI": HotelAPI,
+                "CarRentalAPI": CarRentalAPI,
+                "FlightAPI": FlightAPI,
+                "MuseumAPI": MuseumAPI,
+                "RestaurantAPI": RestaurantAPI,
+                "TourGuideAPI": TourGuideAPI
+            }
+            
+            if class_name in api_classes:
+                api_instance = api_classes[class_name](api_key=api_key, base_url=api_base_url)
+                method = getattr(api_instance, action_name)
+                
+                # Execute the API call
+                result = method(**params)
+                
+                # Stream the result back to the user/consumer
+                session.stream(json.dumps(result))
+            else:
+                session.stream(f'{{"error": "Unknown class {class_name}"}}')
+                
+        except json.JSONDecodeError:
+            session.stream(f'{{"error": "Language model did not return valid JSON.", "response": {json.dumps(response_text)}}}')
+        except AttributeError:
+            session.stream(f'{{"error": "Method {action_name} not found on {class_name}"}}')
+        except Exception as e:
+            session.stream(f'{{"error": "Error executing API call: {str(e)}"}}')
+
         session.close()
 
     except Exception as e:
