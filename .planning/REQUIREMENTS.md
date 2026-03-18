@@ -10,8 +10,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Search & Scoring
 
 - [ ] **SRCH-01**: Provider Agent calls Amadeus API with destination, dates, guests, and max price constraints
-- [ ] **SRCH-02**: API response is normalized to 0–1 scores across 5 dimensions (price, location, rating, cancellation, amenities)
-- [ ] **SRCH-03**: Scoring engine applies weighted formula — all weights sum to 1.0, produces total score 0–1
+- [x] **SRCH-02**: API response is normalized to 0–1 scores across 5 dimensions (price, location, rating, cancellation, amenities)
+- [x] **SRCH-03**: Scoring engine applies weighted formula — all weights sum to 1.0, produces total score 0–1
 - [ ] **SRCH-04**: Results ranked by total score, top 3 returned with score breakdowns
 - [ ] **SRCH-05**: Top results tagged: BEST_BALANCE, CHEAPEST, HIGHEST_RATED
 - [ ] **SRCH-06**: Re-scoring with changed weights produces new rankings without re-fetching from API
@@ -34,8 +34,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Data Models
 
-- [ ] **DATA-01**: Pydantic models in shared/models.py match README JSON schemas exactly (Consumer→Provider and Provider→Consumer)
-- [ ] **DATA-02**: Defensive scoring handles edge cases (€0 prices, null ratings, missing amenities, division by zero)
+- [x] **DATA-01**: Pydantic models in shared/models.py match README JSON schemas exactly (Consumer→Provider and Provider→Consumer)
+- [x] **DATA-02**: Defensive scoring handles edge cases (€0 prices, null ratings, missing amenities, division by zero)
 
 ## v2 Requirements
 
@@ -80,11 +80,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | Phase 1 | Pending |
-| DATA-02 | Phase 1 | Pending |
+| DATA-01 | Phase 1 | Complete |
+| DATA-02 | Phase 1 | Complete |
 | SRCH-01 | Phase 2 | Pending |
-| SRCH-02 | Phase 1 | Pending |
-| SRCH-03 | Phase 1 | Pending |
+| SRCH-02 | Phase 1 | Complete |
+| SRCH-03 | Phase 1 | Complete |
 | SRCH-04 | Phase 3 | Pending |
 | SRCH-05 | Phase 3 | Pending |
 | SRCH-06 | Phase 3 | Pending |
