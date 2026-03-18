@@ -55,10 +55,10 @@ Plans:
   1. Search returns top 3 results ranked by total score with individual dimension breakdowns
   2. Results are tagged: BEST_BALANCE (highest total), CHEAPEST (best price score), HIGHEST_RATED (best rating score)
   3. Changing weights produces new rankings from cached results without re-fetching from API
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — Search pipeline wiring (search + rescore)
 
 ### Phase 4: CRUD & Action Routing
 **Goal**: Agent routes all actions and handles complete booking lifecycle
