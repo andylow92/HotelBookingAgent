@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: Not started
+current_plan: 1 of 1
 status: completed
-last_updated: "2026-03-18T11:58:53.488Z"
+last_updated: "2026-03-18T12:34:17Z"
 last_activity: 2026-03-18
 progress:
-  total_phases: 1
-  completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  total_phases: 5
+  completed_phases: 2
+  total_plans: 2
+  completed_plans: 2
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** Given weighted preferences, score hotel results accurately and return ranked options with clear tradeoff explanations
-**Current focus:** Phase 1 - Data Models & Scoring Engine
+**Current focus:** Phase 2 - API Client & Mock Fallback
 
 ## Current Position
 
-**Phase:** 1 of 5 (Data Models & Scoring Engine)
-**Current Plan:** Not started
+**Phase:** 2 of 5 (API Client & Mock Fallback)
+**Current Plan:** 1 of 1
 **Total Plans in Phase:** 1
-**Status:** Milestone complete
+**Status:** Phase complete
 **Last Activity:** 2026-03-18
 
 ## Performance Metrics
@@ -49,6 +49,7 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 
 *Updated after each plan completion*
 | Phase 01 P01 | 3min | 2 tasks | 4 files |
+| Phase 02 P01 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Neutral score 0.5 for unknown data (zero prices, negative distances) — not pessimistic 0.0
 - [Phase 01]: DEFAULT_RATING=3.0 for null ratings — mid-range assumption for unrated hotels
 - [Phase 01]: Created .venv for Python dependency management (externally-managed macOS Python)
+- [Phase 02]: Broad except Exception for API fallback — no error type distinction, immediate mock return
+- [Phase 02]: distance_km=0.0 and amenities=[] for API results — scorer handles with neutral scores
+- [Phase 02]: No retry logic — single failure triggers immediate mock fallback
 
 ### Pending Todos
 
@@ -75,5 +79,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Roadmap created, ready to plan Phase 1
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None

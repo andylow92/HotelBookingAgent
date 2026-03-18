@@ -9,7 +9,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Search & Scoring
 
-- [ ] **SRCH-01**: Provider Agent calls Amadeus API with destination, dates, guests, and max price constraints
+- [x] **SRCH-01**: Provider Agent calls Amadeus API with destination, dates, guests, and max price constraints
 - [x] **SRCH-02**: API response is normalized to 0–1 scores across 5 dimensions (price, location, rating, cancellation, amenities)
 - [x] **SRCH-03**: Scoring engine applies weighted formula — all weights sum to 1.0, produces total score 0–1
 - [ ] **SRCH-04**: Results ranked by total score, top 3 returned with score breakdowns
@@ -29,8 +29,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Reliability
 
-- [ ] **RLBL-01**: Mock data fallback (mock_data.py) returns realistic Berlin hotel results when API is unavailable
-- [ ] **RLBL-02**: Graceful error handling auto-falls back to mock data on API failure
+- [x] **RLBL-01**: Mock data fallback (mock_data.py) returns realistic Berlin hotel results when API is unavailable
+- [x] **RLBL-02**: Graceful error handling auto-falls back to mock data on API failure
 
 ### Data Models
 
@@ -82,7 +82,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | DATA-01 | Phase 1 | Complete |
 | DATA-02 | Phase 1 | Complete |
-| SRCH-01 | Phase 2 | Pending |
+| SRCH-01 | Phase 2 | Complete |
 | SRCH-02 | Phase 1 | Complete |
 | SRCH-03 | Phase 1 | Complete |
 | SRCH-04 | Phase 3 | Pending |
@@ -93,8 +93,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CRUD-02 | Phase 4 | Pending |
 | CRUD-03 | Phase 4 | Pending |
 | CRUD-04 | Phase 4 | Pending |
-| RLBL-01 | Phase 2 | Pending |
-| RLBL-02 | Phase 2 | Pending |
+| RLBL-01 | Phase 2 | Complete |
+| RLBL-02 | Phase 2 | Complete |
 
 **Coverage:**
 - v1 requirements: 16 total
