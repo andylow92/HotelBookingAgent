@@ -3,3 +3,6 @@ services:
     build: .
     ports:
       - "8001:8001"
+    volumes:
+      - /home/ramon/.orcapt/config.json:/root/.orcapt/config.json
+    entrypoint: [ "bash", "-c", "while true; do sleep 3600; done" ]

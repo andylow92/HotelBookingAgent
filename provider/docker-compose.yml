@@ -3,3 +3,5 @@ services:
     build: .
     ports:
       - "8000:8000"
+    volumes:
+      - /home/ramon/.orcapt/config.json:/root/.orcapt/config.json
