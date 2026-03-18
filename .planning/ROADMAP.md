@@ -81,10 +81,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Negotiation note generator produces human-readable explanation of tradeoffs between top 3 options
   2. Notes explain price vs location vs rating tradeoffs specific to the actual results
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — Negotiation note generator + search/rescore wiring
 
 ## Progress
 
