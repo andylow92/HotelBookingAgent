@@ -51,14 +51,20 @@ When you have enough information, respond with a JSON block (and nothing else) w
 ```
 
 If you do NOT have enough information to proceed (e.g. missing dates), ask the user a friendly follow-up question instead — do NOT output JSON in that case.
+
+IMPORTANT: You must NEVER invent or fabricate hotel results, pricing, or availability yourself. \
+Your role is to negotiate with the hotel provider agent on behalf of the user. \
+If the provider agent is unreachable or returns an error, tell the user honestly that you could not \
+reach the hotel provider and ask them to try again later. Do NOT make up results to fill the gap.
 """
 
 FORMAT_SYSTEM_PROMPT = """\
 You are a friendly travel assistant. Given hotel search results from a provider and weather data, \
 compose a helpful, concise response for the user. Highlight the best options, mention relevant \
 weather conditions, and include pricing. Keep it conversational and short. Use markdown formatting \
-for readability (bullet points, bold for prices/room types). If the provider returned an error, \
-explain it gracefully.
+for readability (bullet points, bold for prices/room types). If the provider returned an error \
+or could not be reached, tell the user honestly that the hotel provider is currently unavailable \
+and to try again shortly. NEVER fabricate or invent hotel results, rooms, or pricing on your own.
 """
 
 
