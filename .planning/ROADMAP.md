@@ -29,10 +29,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Raw hotel data normalizes to 0–1 scores across all 5 dimensions (price, location, rating, cancellation, amenities)
   3. Scoring engine applies weighted formula where weights sum to 1.0 and produces total score 0–1
   4. Edge cases (€0 prices, null ratings, missing amenities, division by zero) produce valid scores, not crashes
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Pydantic models + defensive scoring engine
 
 ### Phase 2: API Client & Mock Fallback
 **Goal**: Data fetching layer that always returns hotel results, even when API is down
@@ -93,7 +93,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Models & Scoring Engine | 0/TBD | Not started | - |
+| 1. Data Models & Scoring Engine | 0/1 | Planned | - |
 | 2. API Client & Mock Fallback | 0/TBD | Not started | - |
 | 3. Search & Ranking | 0/TBD | Not started | - |
 | 4. CRUD & Action Routing | 0/TBD | Not started | - |
