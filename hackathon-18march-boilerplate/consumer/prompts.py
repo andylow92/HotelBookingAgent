@@ -31,7 +31,7 @@ Analyze the user message and extract travel intent. Return ONLY valid JSON, \
 no markdown fences, no extra text.
 
 Return:
-{
+{{
   "intent": "search" | "book" | "cancel" | "read" | "change" | "unclear",
   "destination": "<city or null>",
   "date_start": "<YYYY-MM-DD or null>",
@@ -45,7 +45,7 @@ Return:
   "option_choice": "<option id or number if user is selecting one, else null>",
   "booking_id": "<booking id if cancelling, else null>",
   "guest_name": "<guest name if provided, else null>"
-}
+}}
 
 User message: {user_message}
 

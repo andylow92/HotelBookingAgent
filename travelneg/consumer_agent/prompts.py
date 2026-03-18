@@ -26,46 +26,46 @@ Always reply in a warm, concise style. Use the provider's negotiation_note \
 to explain tradeoffs. Mention weather when it's relevant.
 
 When extracting constraints, output a JSON object with this schema:
-{
+{{
   "action": "search" | "book" | "cancel" | "read",
   "domain": "<assigned domain>",
   "destination": "<city>",
   "date_start": "<YYYY-MM-DD>",
   "date_end": "<YYYY-MM-DD>",
   "guests": <int>,
-  "hard_constraints": {
+  "hard_constraints": {{
     "max_price": <float>,
     "currency": "EUR"
-  },
-  "weights": {
+  }},
+  "weights": {{
     "price": <0-1>,
     "location": <0-1>,
     "rating": <0-1>,
     "flexibility": <0-1>,
     "match": <0-1>
-  },
-  "context": {
+  }},
+  "context": {{
     "preferred_area": "<area name or null>",
-    "preferred_area_coords": {"lat": <float>, "lon": <float>} or null,
+    "preferred_area_coords": {{"lat": <float>, "lon": <float>}} or null,
     "weather": <weather context object or null>,
     "desired_features": [<list of strings>]
-  }
-}
+  }}
+}}
 
 For booking:
-{
+{{
   "action": "book",
   "option_id": "<id from search results>",
   "guest_name": "<name>",
   "date_start": "<YYYY-MM-DD>",
   "date_end": "<YYYY-MM-DD>"
-}
+}}
 
 For cancellation:
-{
+{{
   "action": "cancel",
   "booking_id": "<booking id>"
-}
+}}
 """
 
 EXTRACT_INTENT_PROMPT = """\
@@ -73,7 +73,7 @@ Analyze the user message and extract travel intent. Return ONLY valid JSON, \
 no markdown fences, no extra text.
 
 Return:
-{
+{{
   "intent": "search" | "book" | "cancel" | "read" | "change" | "unclear",
   "destination": "<city or null>",
   "date_start": "<YYYY-MM-DD or null>",
@@ -87,7 +87,7 @@ Return:
   "option_choice": "<option id or number if user is selecting one, else null>",
   "booking_id": "<booking id if cancelling, else null>",
   "guest_name": "<guest name if provided, else null>"
-}
+}}
 
 User message: {user_message}
 
