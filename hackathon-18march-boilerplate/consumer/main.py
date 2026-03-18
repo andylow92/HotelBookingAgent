@@ -1,7 +1,7 @@
 """Consumer Agent — personal travel assistant.
 
 This agent is user-facing. It:
-1. Parses user intent using an LLM
+1. Parses user intent using an LLM (Anthropic Claude)
 2. Enriches requests with weather + geocoding data
 3. Delegates to provider agents via Orca (session.ask_agent)
 4. Presents results back to the user in a friendly way
@@ -14,7 +14,7 @@ import json
 import logging
 import os
 
-from openai import OpenAI
+import anthropic
 from orca import create_agent_app, ChatMessage, OrcaHandler, Variables, ChatHistoryHelper
 
 from prompts import SYSTEM_PROMPT, EXTRACT_INTENT_PROMPT
@@ -30,8 +30,8 @@ logger = logging.getLogger(__name__)
 class ConsumerAgent:
     """Stateful consumer agent that manages a single conversation turn."""
 
-    def __init__(self, openai_api_key: str, domain: str = "hotels"):
-        self.client = OpenAI(api_key=openai_api_key)
+    def __init__(self, anthropic_api_key: str, domain: str = "hotels"):
+        self.client = anthropic.Anthropic(api_key=anthropic_api_key)
         self.domain = domain
 
         # Conversation state
@@ -375,45 +375,36 @@ class ConsumerAgent:
         session.stream(friendly_response)
         session.close()
 
+    def _call_claude(self, system: str, user_content: str, max_tokens: int = 500, temperature: float = 0.1) -> str:
+        """Call Anthropic Claude API and return the text response."""
+        response = self.client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=max_tokens,
+            system=system,
+            messages=[{"role": "user", "content": user_content}],
+            temperature=temperature,
+        )
+        return response.content[0].text
+
     def _extract_intent(self, user_message: str, chat_history: str) -> dict:
-        """Use LLM to extract structured intent from user message."""
+        """Use Claude to extract structured intent from user message."""
         prompt = EXTRACT_INTENT_PROMPT.format(
             user_message=user_message,
             chat_history=chat_history,
         )
 
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=0.1,
-                max_tokens=500,
-            )
-            content = response.choices[0].message.content.strip()
-            return json.loads(content)
+            content = self._call_claude(SYSTEM_PROMPT, prompt, max_tokens=500, temperature=0.1)
+            return json.loads(content.strip())
         except (json.JSONDecodeError, Exception) as e:
             logger.error("Intent extraction failed: %s", e)
             return {"intent": "unclear"}
 
     def _synthesize_response(self, provider_data: str, instruction: str) -> str:
-        """Use LLM to turn provider data into a friendly user-facing response."""
+        """Use Claude to turn provider data into a friendly user-facing response."""
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {
-                        "role": "user",
-                        "content": f"{instruction}\n\nProvider response:\n{provider_data}",
-                    },
-                ],
-                temperature=0.7,
-                max_tokens=600,
-            )
-            return response.choices[0].message.content.strip()
+            user_content = f"{instruction}\n\nProvider response:\n{provider_data}"
+            return self._call_claude(SYSTEM_PROMPT, user_content, max_tokens=600, temperature=0.7)
         except Exception as e:
             logger.error("Response synthesis failed: %s", e)
             return provider_data
@@ -464,21 +455,20 @@ async def process_message(data: ChatMessage):
     try:
         variables = Variables(data.variables)
 
-        # Try Orca variables first, then fall back to environment variable
-        openai_key = variables.get("OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
+        # Get Anthropic API key from Orca variables or environment
+        api_key = variables.get("MADHACK-ANTHROPIC-KEY") or os.environ.get("ANTHROPIC_API_KEY")
 
-        if not openai_key:
+        if not api_key:
             session.stream(
-                "OpenAI API key is not configured. "
-                "Set it as an Orca variable or as the OPENAI_API_KEY environment variable.\n"
-                "Example: export OPENAI_API_KEY=sk-..."
+                "Anthropic API key is not configured. "
+                "Set MADHACK-ANTHROPIC-KEY in Orca or ANTHROPIC_API_KEY as env var."
             )
             session.close()
             return
 
         domain = variables.get("DOMAIN") or os.environ.get("DOMAIN") or "hotels"
 
-        agent = ConsumerAgent(openai_api_key=openai_key, domain=domain)
+        agent = ConsumerAgent(anthropic_api_key=api_key, domain=domain)
         await agent.handle_message(session, data)
 
     except Exception as e:
