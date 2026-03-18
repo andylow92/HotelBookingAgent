@@ -237,3 +237,131 @@ def score_and_rank(
 
     # Assign tags
     return _assign_tags(top)
+
+
+# ---------------------------------------------------------------------------
+# Negotiation note generation
+# ---------------------------------------------------------------------------
+
+def generate_negotiation_note(
+    options: list[HotelOption],
+    weights: Weights,
+) -> str:
+    """Build a human-readable tradeoff explanation for the top scored hotels.
+
+    Compares BEST_BALANCE, CHEAPEST, and HIGHEST_RATED options in
+    travel-advisor tone with concrete numeric values (€ prices, star
+    ratings, km distances). Adapts emphasis based on the user's heaviest
+    weight dimension.
+
+    Args:
+        options: Top scored/tagged HotelOption list (typically 3).
+        weights: The user's preference weights.
+
+    Returns:
+        A negotiation note string, or ``""`` if no options.
+    """
+    # --- Guard clauses ---
+    if len(options) == 0:
+        return ""
+    if len(options) == 1:
+        o = options[0]
+        return f"Only one option matched your criteria: {o.name} at €{o.price_per_night:.0f}/night."
+
+    # --- Identify roles by tag ---
+    by_tag: dict[str, HotelOption] = {o.tag: o for o in options if o.tag}
+    best: HotelOption = by_tag.get("BEST_BALANCE", options[0])
+    cheapest: HotelOption | None = by_tag.get("CHEAPEST")
+    highest_rated: HotelOption | None = by_tag.get("HIGHEST_RATED")
+
+    # --- Adaptive length: if scores are very close, short note ---
+    scores = [o.total_score for o in options]
+    if max(scores) - min(scores) < 0.05:
+        return (
+            f"All three options are closely matched — {best.name} edges "
+            f"ahead slightly at €{best.price_per_night:.0f}/night."
+        )
+
+    # --- Detect dominant weight ---
+    weight_map = {
+        "price": weights.price,
+        "location": weights.location,
+        "rating": weights.rating,
+        "cancellation": weights.cancellation,
+        "amenities": weights.amenities,
+    }
+    dominant = max(weight_map, key=lambda k: weight_map[k])
+
+    # --- Helper: build comparison sentence for cheapest ---
+    def _cheapest_comparison() -> str:
+        if cheapest is None or cheapest.id == best.id:
+            return ""
+        parts: list[str] = []
+        price_diff = best.price_per_night - cheapest.price_per_night
+        if abs(price_diff) < 1:
+            parts.append("similarly priced")
+        else:
+            parts.append(f"€{price_diff:.0f}/night cheaper")
+
+        # Tradeoffs
+        tradeoffs: list[str] = []
+        rating_drop = best.rating - cheapest.rating
+        if abs(rating_drop) >= 0.2:
+            tradeoffs.append(f"drops to {cheapest.rating:.1f} stars")
+        dist_diff = cheapest.distance_km - best.distance_km
+        if abs(dist_diff) >= 0.2 and not (cheapest.distance_km == 0.0 and best.distance_km == 0.0):
+            tradeoffs.append(f"sits {abs(dist_diff):.1f}km further")
+        if best.free_cancellation and not cheapest.free_cancellation:
+            tradeoffs.append("lacks free cancellation")
+
+        sentence = f"{cheapest.name} is {', '.join(parts)}"
+        if tradeoffs:
+            sentence += f" but {', '.join(tradeoffs)}"
+        return sentence + "."
+
+    # --- Helper: build comparison sentence for highest rated ---
+    def _highest_rated_comparison() -> str:
+        if highest_rated is None or highest_rated.id == best.id:
+            return ""
+        parts: list[str] = []
+        parts.append(
+            f"leads on rating (rated {highest_rated.rating:.1f} vs {best.rating:.1f})"
+        )
+
+        # Distance advantage
+        dist_diff = best.distance_km - highest_rated.distance_km
+        if abs(dist_diff) >= 0.2 and not (highest_rated.distance_km == 0.0 and best.distance_km == 0.0):
+            parts.append(f"closer at {highest_rated.distance_km:.1f}km")
+
+        # Price premium tradeoff
+        price_premium = highest_rated.price_per_night - best.price_per_night
+        tradeoff = ""
+        if abs(price_premium) >= 1:
+            tradeoff = f" but costs €{price_premium:.0f}/night more"
+
+        sentence = f"{highest_rated.name} {', '.join(parts)}{tradeoff}"
+        return sentence + "."
+
+    # --- Lead sentence about BEST_BALANCE ---
+    cancel_str = "with free cancellation" if best.free_cancellation else "without free cancellation"
+    lead = (
+        f"{best.name} offers the best balance at €{best.price_per_night:.0f}/night "
+        f"(rated {best.rating:.1f}, {best.distance_km:.1f}km out) {cancel_str}."
+    )
+
+    # --- Compose sections ---
+    cheap_section = _cheapest_comparison()
+    rated_section = _highest_rated_comparison()
+
+    # --- Reorder based on dominant weight ---
+    if dominant in ("rating", "amenities") and rated_section:
+        # Lead with highest-rated comparison when rating/amenities dominate
+        sections = [lead, rated_section, cheap_section]
+    elif dominant == "location" and rated_section:
+        # Location-heavy: highest-rated often has best location, lead with it
+        sections = [lead, rated_section, cheap_section]
+    else:
+        # Default / price / cancellation: lead with cheapest comparison
+        sections = [lead, cheap_section, rated_section]
+
+    return " ".join(s for s in sections if s)
